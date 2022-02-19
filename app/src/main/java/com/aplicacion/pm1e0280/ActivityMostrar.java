@@ -44,7 +44,7 @@ public class ActivityMostrar extends AppCompatActivity {
     SQLiteConexion conexion;
     ListView listViewContacto;
 
-    ArrayList<Contacto> listContactos;
+    ArrayList<Contacto> listContactos, listRes;
 
     ArrayList<String> listaStringContactos;
 
@@ -54,7 +54,12 @@ public class ActivityMostrar extends AppCompatActivity {
 
     EditText textEditBuscar;
 
-    ArrayAdapter adapter;
+//    ArrayAdapter adapter;
+    Adaptador adapter, adc;
+
+    int idBusqueda;
+
+    TextView tv;
 
 
     AlertDialog.Builder builder;
@@ -181,33 +186,50 @@ public class ActivityMostrar extends AppCompatActivity {
                 lastTouchTime = currentTouchTime;
                 currentTouchTime = System.currentTimeMillis();
 
-                contactoSeleccionado = listContactos.get(i);
+//                contactoSeleccionado = listContactos.get(i);
+
+
+                 tv = (TextView) view.findViewById(R.id.itemObjetId);
+                 idBusqueda = Integer.parseInt(tv.getText().toString());
+
+
+                 adc =(Adaptador) adapterView.getAdapter();
+
+                 listRes = adc.getFilterlist();
+
+                for(int j=0;j<listRes.size();j++){
+                    if(listRes.get(j).getId() == idBusqueda){
+                        contactoSeleccionado = listRes.get(j);
+                        break;
+                    }
+                }
 
                 //Esto es cuando se preciona dos veces
                 if (currentTouchTime - lastTouchTime < 250) {
 
-                    Toast.makeText(getApplicationContext(), contactoSeleccionado.getNombre(), Toast.LENGTH_LONG).show();
+
+//                    Toast.makeText(getApplicationContext(), contactoSeleccionado.getNombre(), Toast.LENGTH_LONG).show();
 
 
 
-//                        builder = new AlertDialog.Builder(ActivityMostrar.this);
-//
-//                        builder.setMessage("¿Desea llamar a "+contactoSeleccionado.getNombre()+" ?").setTitle("Alerta");
-//
-//                        builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialogInterface, int i) {
-//                                permisosLlamar();
-//                            }
-//                        });
-//
-//                        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialogInterface, int i) {}
-//                        });
-//
-//                        dialog = builder.create();
-//                        dialog.show();
+                        builder = new AlertDialog.Builder(ActivityMostrar.this);
+
+                        builder.setMessage("¿Desea llamar a "+contactoSeleccionado.getNombre()+" ?").setTitle("Alerta");
+
+                        builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                permisosLlamar();
+                            }
+                        });
+
+                        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {}
+                        });
+
+                        dialog = builder.create();
+                        dialog.show();
 
                     lastTouchTime = 0;
                     currentTouchTime = 0;
@@ -241,6 +263,7 @@ public class ActivityMostrar extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        textEditBuscar.setText("");
         obtenerListaContactos();
         llenarListView();
 
@@ -262,7 +285,9 @@ public class ActivityMostrar extends AppCompatActivity {
 
         obtenerListaContactos();
 
-        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listaStringContactos);
+//        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listaStringContactos);
+        adapter = new Adaptador(ActivityMostrar.this, listContactos);
+
         listViewContacto.setAdapter(adapter);
     }
 
@@ -338,7 +363,9 @@ public class ActivityMostrar extends AppCompatActivity {
     private void llenarListView() {
 
         adapter = null;
-        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listaStringContactos);
+//        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listaStringContactos);
+
+        adapter = new Adaptador(ActivityMostrar.this, listContactos);
         listViewContacto.setAdapter(adapter);
     }
 
@@ -362,7 +389,7 @@ public class ActivityMostrar extends AppCompatActivity {
     public void mostrarImagen(){
 
         if(isTextEmpty(contactoSeleccionado.getImagen())){
-            mostrarMensaje("Alerta", "El contacto no tiene ninguna imagen seleccionada");
+            mostrarMensaje("Alerta", "El contacto no tiene ninguna imagen asignada");
             return;
         }
 
